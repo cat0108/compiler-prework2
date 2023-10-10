@@ -77,7 +77,7 @@ int yylex();
 extern int yyparse();
 FILE* yyin;
 void yyerror(const char* s);
-int reg = 0;  // 使用一个简单的寄存器分配策略
+int reg = -1; //定义全局寄存器编号
 
 #line 83 "asm.c"
 
@@ -565,8 +565,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    24,    24,    25,    26,    29,    33,    37,    41,    45,
-      46,    49
+       0,    24,    24,    28,    29,    32,    36,    40,    44,    48,
+      49,    52
 };
 #endif
 
@@ -1136,65 +1136,69 @@ yyreduce:
     {
   case 2: /* lines: lines expr ';'  */
 #line 24 "asm.y"
-                         { printf("MOV r%d, r%d\n", reg-1, reg-1); }
-#line 1141 "asm.c"
+                         {  
+                            printf("the final result in r%d\n", reg);
+                            printf("@   assembly code end\n");
+                        }
+#line 1144 "asm.c"
     break;
 
   case 5: /* expr: expr ADD expr  */
-#line 29 "asm.y"
+#line 32 "asm.y"
                         { 
-            printf("ADD r%d, r%d, r%d\n", reg-2, reg-2, reg-1);
-            reg--;
+            printf("ADD r%d, r%d, r%d\n", reg-1, reg-1, reg);
+            reg--;//每次进行二元运算后，减少寄存器数量
         }
-#line 1150 "asm.c"
+#line 1153 "asm.c"
     break;
 
   case 6: /* expr: expr MINUS expr  */
-#line 33 "asm.y"
+#line 36 "asm.y"
                           { 
-            printf("SUB r%d, r%d, r%d\n", reg-2, reg-2, reg-1);
+            printf("SUB r%d, r%d, r%d\n", reg-1, reg-1, reg);
             reg--;
         }
-#line 1159 "asm.c"
+#line 1162 "asm.c"
     break;
 
   case 7: /* expr: expr MUL expr  */
-#line 37 "asm.y"
+#line 40 "asm.y"
                         { 
-            printf("MUL r%d, r%d, r%d\n", reg-2, reg-2, reg-1);
+            printf("MUL r%d, r%d, r%d\n", reg-1, reg-1, reg);
             reg--;
         }
-#line 1168 "asm.c"
+#line 1171 "asm.c"
     break;
 
   case 8: /* expr: expr DIV expr  */
-#line 41 "asm.y"
+#line 44 "asm.y"
                         { 
-            printf("SDIV r%d, r%d, r%d\n", reg-2, reg-2, reg-1);
+            printf("SDIV r%d, r%d, r%d\n", reg-1, reg-1, reg);
             reg--;
         }
-#line 1177 "asm.c"
+#line 1180 "asm.c"
     break;
 
   case 10: /* expr: MINUS expr  */
-#line 46 "asm.y"
+#line 49 "asm.y"
                                   { 
-            printf("NEG r%d, r%d\n", reg-1, reg-1);
+            printf("NEG r%d, r%d\n", reg, reg);
         }
-#line 1185 "asm.c"
+#line 1188 "asm.c"
     break;
 
   case 11: /* expr: NUMBER  */
-#line 49 "asm.y"
+#line 52 "asm.y"
                  { 
-            printf("MOV r%d, #%d\n", reg, (int)yylval);
-            reg++;
+            reg++;//给每一个新读取到的数字分配新一个寄存器
+            printf("MOV r%d, #%d\n", reg, yylval);
+
         }
-#line 1194 "asm.c"
+#line 1198 "asm.c"
     break;
 
 
-#line 1198 "asm.c"
+#line 1202 "asm.c"
 
       default: break;
     }
@@ -1387,7 +1391,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 55 "asm.y"
+#line 59 "asm.y"
 
 
 int yylex() {
@@ -1427,11 +1431,10 @@ int yylex() {
 
 int main(void) {
     yyin = stdin;
-    printf("@ Start of ARMv7 assembly code\n");
+    printf("@  assembly code begin\n");
     do{
         yyparse();
     } while(!feof(yyin));
-    printf("@ End of ARMv7 assembly code\n");
     return 0;
 }
 

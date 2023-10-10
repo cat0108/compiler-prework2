@@ -13,4 +13,4 @@ asm:
 	yacc asm.y -o asm.c
 	gcc -o asm asm.c
 clean:
-	rm -rf expression suffix expression.c suffix.c	expression_pro expression_pro.c
+	rm -rf expression suffix expression.c suffix.c	expression_pro expression_pro.c asm asm.c

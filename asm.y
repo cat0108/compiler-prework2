@@ -21,7 +21,10 @@ int reg = -1; //定义全局寄存器编号
 
 %%
 
-lines   : lines expr ';' { printf("MOV r%d, r%d\n", reg, reg); }
+lines   : lines expr ';' {  
+                            printf("the final result in r%d\n", reg);
+                            printf("@   assembly code end\n");
+                        }
         | lines ';'
         | 
         ;
